@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.authors       = ["lacravate"]
   s.email         = ["lacravate@lacravate.fr"]
   s.homepage      = "https://github.com//ways-and-means"
-  s.summary       = "TODO: summary"
-  s.description   = "TODO: description"
+  s.summary       = "Sinatra routes and settings from a configuration file"
+  s.description   = "Sinatra routes and settings from a configuration file"
 
   s.files         = `git ls-files app lib`.split("\n")
   s.platform      = Gem::Platform::RUBY

@@ -10,10 +10,10 @@ module Sinatra
     # HTTP verbs list
     VERBS = %w|get post patch put delete head options|.freeze
 
-    def ways_and_means!
+    def ways_and_means!(ways_and_means=nil)
       # Pfff'... Should probably be more tyrannical here...
       # if you registered, you should know what you're doing, right ?
-      return unless config
+      return unless @config = ways_and_means || config
 
       # the verb
       # the endpoint to string prefixed by '/'

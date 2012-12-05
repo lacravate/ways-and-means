@@ -106,7 +106,7 @@ module Sinatra
       end
     end
 
-    # Well... What can i say now ? Oh, too many parentheses !
+    # Well... What can i say now ...? Oh, i know : too many parentheses !
     def config
       @config ||= YAML.load(open(File.join('config', 'ways-and-means.yml'))) rescue nil
     end

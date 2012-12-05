@@ -35,8 +35,7 @@ module Sinatra
     private
 
     def ways
-      # i allow people to be less funky than i am with key names, hence 'routes'
-      (config['ways'] || config['routes'] || {}).each do |endpoint, dispatch|
+      ways_config.each do |endpoint, dispatch|
         # home: { get: { to: 'home', other_params: "plop" }, patch: { to: 'patch_home', other_params: "plip" } }
         # get '/home' do
         #   home
@@ -70,6 +69,18 @@ module Sinatra
       end
     end
 
+    def ways_config
+      # at least this is safe and very explicit
+      # hash.slice, i miss you...
+      config['ways'] || config[:ways] || config['routes'] || config[:routes] || {}
+
+      # while this is not
+      # WAYS_KEYS.inject({}) { |w, k| w.merge!(config[k] || config[k.to_sym] || {}) }
+
+      # and this is ruby-coated Perl
+      # WAYS_KEYS.map { |k| [k, k.to_sym] }.flatten.map { |k| config[k] }.compact.first
+    end
+ 
     def means
       # set key / values in App.settings
       means_config do |mean, it|

@@ -28,6 +28,10 @@ module Sinatra
       #   callback
       # end
       ways do |endpoint, dispatch|
+        # if ever you wanna do something
+        # with dispatch info' set right
+        yield endpoint, dispatch if block_given?
+
         send dispatch[:verb], "/#{endpoint}" do
           send dispatch[:to]
         end

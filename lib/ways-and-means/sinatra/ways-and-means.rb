@@ -7,6 +7,11 @@ module Sinatra
 
   module WaysAndMeans
 
+    # reserved configuration keys
+    # i allow people to be less funky than i am
+    # with key names, hence 'routes'
+    WAYS_KEYS = %w|ways routes|.freeze
+
     # HTTP verbs list
     VERBS = %w|get post patch put delete head options|.freeze
 
@@ -44,16 +49,18 @@ module Sinatra
         # patch '/home' do
         #   patch_home
         # end
-        if dispatch.is_a?(Hash) && dispatch.keys.any? { |k| VERBS.include? k }
+        if dispatch.is_a?(Hash) && dispatch.keys.any? { |k| VERBS.include? k.to_s }
           dispatch.each do |k, v|
             yield endpoint, v.merge(verb: k)
           end
+
         # index: { to: 'show_index', other_params: "plop" }
         # get '/index' do  ## no verb specified, defaulted to 'get'
         #   show_index
         # end
         elsif dispatch.is_a?(Hash)
           yield endpoint, { verb: 'get' }.merge!(dispatch)
+
         # show: nil
         # get '/show' do  ## no verb specified, defaulted to 'get'
         #   show
@@ -90,7 +97,7 @@ module Sinatra
  
     def means_config
       # key / values except reserved space for routes
-      config.reject { |k, v| k == 'ways' || k == 'routes' }.each do |k, v|
+      config.reject { |k, v| WAYS_KEYS.include? k.to_s }.each do |k, v|
         yield k.to_sym, v
       end
     end

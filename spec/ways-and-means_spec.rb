@@ -8,8 +8,13 @@ describe Sinatra::WaysAndMeans do
 
   describe "routes" do
     it "should not respond to /" do
-      browser.get '/plop'
+      browser.get '/'
       browser.last_response.status.should == 404
+    end
+
+    it "should respond to GET /here" do
+      browser.get '/here'
+      browser.last_response.body.should == 'here'
     end
 
     it "should respond to POST /there" do

@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 require 'sinatra/base'
-require 'yaml'
 
 module Sinatra
 
@@ -81,8 +80,8 @@ module Sinatra
     end
 
     def ways_config
-      # at least this is safe and very explicit
       # hash.slice, i miss you...
+      # at least this is safe and very explicit
       config['ways'] || config[:ways] || config['routes'] || config[:routes] || {}
 
       # while this is not

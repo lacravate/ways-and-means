@@ -56,7 +56,6 @@ require 'sinatra/base'
 
 # The app'
 class WaysAndMeansTester < Sinatra::Base
-YAML.load(open(File.join('config', 'ways-and-means.yml')))
   # our own teeny tiny snippet
   register Sinatra::WaysAndMeans
   

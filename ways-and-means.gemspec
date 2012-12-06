@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.version       = WaysAndMeans::VERSION
   s.authors       = ["lacravate"]
   s.email         = ["lacravate@lacravate.fr"]
-  s.homepage      = "https://github.com//ways-and-means"
+  s.homepage      = "https://github.com/lacravate/ways-and-means"
   s.summary       = "Sinatra routes and Sinatra settings from configuration data"
   s.description   = "Sinatra routes and Sinatra settings through configuration data, hash or yaml file"
 

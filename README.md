@@ -47,7 +47,7 @@ ways:
   there:
     post:
       to: "post_there"
-    patch: "api_key"
+    patch:
       to: "patch_there"
   index:
     to: 'show_index'
@@ -56,7 +56,7 @@ ways:
     verb: 'post'
   'show/:person_id': "show_person"
 
-name: 'ways-and-means',
+name: 'ways-and-means'
 ```
 
 is equivalent, in a Sinatra app', to :

@@ -16,9 +16,6 @@ end
 
 # Routes (and a little bit of conf') in a hash
 conf = {
-  # conf
-  location: 'plop',
-
   # routes
   ways: {
     # /here => here
@@ -40,6 +37,10 @@ conf = {
 
     # get /show/42 => show_person
     'show/:person_id' => "show_person"
+  },
+  means: {
+    # conf
+    location: 'plop'
   }
 }
 

@@ -8,8 +8,9 @@ module Sinatra
 
     # reserved configuration keys
     # i allow people to be less funky than i am
-    # with key names, hence 'routes'
+    # with key names, hence 'routes' and 'config'
     WAYS_KEYS = %w|ways routes|.freeze
+    MEANS_KEYS = %w|means config|.freeze
 
     # HTTP verbs list
     VERBS = %w|get post patch put delete head options|.freeze
@@ -79,6 +80,13 @@ module Sinatra
       end
     end
 
+    def means
+      # set key / values in App.settings
+      means_config.each do |mean, it|
+        set mean, it
+      end
+    end
+ 
     def ways_config
       # hash.slice, i miss you...
       # at least this is safe and very explicit
@@ -91,18 +99,10 @@ module Sinatra
       # WAYS_KEYS.map { |k| [k, k.to_sym] }.flatten.map { |k| config[k] }.compact.first
     end
  
-    def means
-      # set key / values in App.settings
-      means_config do |mean, it|
-        set mean, it
-      end
-    end
- 
     def means_config
-      # key / values except reserved space for routes
-      config.reject { |k, v| WAYS_KEYS.include? k.to_s }.each do |k, v|
-        yield k.to_sym, v
-      end
+      # hash.slice, i miss you...
+      # at least this is safe and very explicit
+      config['means'] || config[:means] || config['config'] || config[:config] || {}
     end
 
     # Well... What can i say now ...? Oh, i know : too many parentheses !

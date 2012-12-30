@@ -38,7 +38,7 @@ conf = {
     # post /list => post_list
     list: { to: 'post_list', verb: 'post' },
 
-    # get /show/42 => qhow_person
+    # get /show/42 => show_person
     'show/:person_id' => "show_person"
   }
 }

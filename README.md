@@ -1,7 +1,8 @@
 # Ways-And-Means
 
 `ways-and-means` allows to pass configuration data to a Sintra app', and use
-a subset of this data to setup the application routes.
+a subset of this data to setup the application routes. Also, there is a very
+simple and starightforward hooks mechanism.
 
 ## Installation
 
@@ -101,6 +102,17 @@ ways_and_means! ways: {
 
 All the key / value pairs found in the `means` hash will be added to your
 application `settings`.
+
+### Hooks
+
+This simple feature lets you setup `before` and `after` hooks. Sinatra already
+has got `before`s and `after`s but they are filters, not hooks.
+
+Given a route callback (say `show_index` in the routes above), user-defined
+`before_anyway` and `before_show_index` (`"before_#{route_callback}"`) methods
+will be executed before the route callback if defined. As well, `after_anyway`
+or `after_show_index` (`"after_#{route_callback}"`) will be executed after the
+route callback if defined.
 
 ## Aims
 

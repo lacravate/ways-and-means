@@ -57,15 +57,27 @@ require 'sinatra/base'
 
 # The app'
 class WaysAndMeansTester < Sinatra::Base
-  # our own teeny tiny snippet
+
   register Sinatra::WaysAndMeans
-  
+
   # call routes setup and define target callback
   # on the fly, for now and any newcomer in the spec's
   ways_and_means! do |endpoint, dispatch|
     define_method dispatch[:to].to_sym do
       dispatch[:to].to_s.dup
     end
+  end
+
+  def before_anyway
+    self.class.set :hook, "hook"
+  end
+
+  def after_show_index
+    self.class.set :hook, "after_show_index"
+  end
+
+  def before_here
+    self.class.set :hook, "before_here"
   end
 
 end

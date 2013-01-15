@@ -33,7 +33,14 @@ module Sinatra
         yield endpoint, dispatch if block_given?
 
         send dispatch[:verb], "/#{endpoint}" do
-          send dispatch[:to]
+          # before hooks before
+          ['before_anyway', "before_#{dispatch[:to]}"].each { |hook| respond_to?(hook) && send(hook) }
+          send(dispatch[:to]).tap do
+            # after hooks in a tap, because i like tap
+            # Mmmh ? And yes, also because i need to maintain the return of the
+            # route call back as the return value of the route
+            ['after_anyway', "after_#{dispatch[:to]}"].each { |hook| respond_to?(hook) && send(hook) }
+          end
         end
       end
 
@@ -111,7 +118,5 @@ module Sinatra
     end
 
   end
-
-  register WaysAndMeans
 
 end

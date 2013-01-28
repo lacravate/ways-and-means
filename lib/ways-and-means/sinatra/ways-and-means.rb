@@ -34,12 +34,12 @@ module Sinatra
 
         send dispatch[:verb], "/#{endpoint}" do
           # before hooks before
-          ['before_anyway', "before_#{dispatch[:to]}"].each { |hook| respond_to?(hook) && send(hook) }
+          ['before_anyway', "before_#{dispatch[:to]}"].each { |hook| respond_to?(hook, true) && send(hook) }
           send(dispatch[:to]).tap do
             # after hooks in a tap, because i like tap
             # Mmmh ? And yes, also because i need to maintain the return of the
             # route call back as the return value of the route
-            ['after_anyway', "after_#{dispatch[:to]}"].each { |hook| respond_to?(hook) && send(hook) }
+            ['after_anyway', "after_#{dispatch[:to]}"].each { |hook| respond_to?(hook, true) && send(hook) }
           end
         end
       end

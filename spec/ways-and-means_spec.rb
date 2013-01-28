@@ -56,4 +56,14 @@ describe Sinatra::WaysAndMeans do
       WaysAndMeansTester.settings.respond_to?(:ways).should be_false
     end 
   end
+
+  describe 'clean endpoints' do
+    let(:routes_array) { [ 'browse', 'browse/*', 'show/*', 'read/*', :plop, 'plip/plap/?', 'show/:resource_id' ] }
+
+    it "should build a set of routes/endpoints from an array" do
+      WaysAndMeansTester.ways_and_means! ways: routes_array do |endpoint, dispatch|
+        [ 'show_resource', 'plop', 'plip_plap', 'browse', 'show', 'read' ].include?(dispatch[:to]).should be_true
+      end
+    end
+  end
 end

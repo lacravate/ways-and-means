@@ -85,6 +85,36 @@ get '/show/:person_id' do
   show_person
 end
 ```
+
+For very (very very) simple routing, routes can be passed as a list,
+`ways-and-means` will do its best to rationalize the endpoint and turn it into a
+callback.
+
+```ruby
+ways_and_means! ways: [:here, 'get/that/?', 'show/:resource_id', 'browse/*']
+
+```
+
+will be (hopefully) understood as :
+
+```ruby
+get '/here' do
+  here
+end
+
+get 'get/that/?' do
+  get_that # '/' turned to '_', trailing '_' is discarded
+end
+
+get 'show/resource_id' do
+  show_resource # '/' turned to '_', '_id' are discarded
+end
+
+get 'browse/*' do
+  browse # keep only /A-Za-z0-9_/, no trailing '_'
+end
+```
+
 ### Means
 
 You can also pass additionnal configuration data with the key `means`.
@@ -138,6 +168,11 @@ unnamed block.
 That i had thinking of the addition of spec's, comments in the code and
 documentation, compared to the amount of code, and the limited scope of this
 snippet dignified to a library with a name. 
+
+## Thanks
+
+Eager and sincere thanks to all the Ruby guys and chicks for making all this so
+easy to devise.
 
 ## Copyright
 

@@ -82,7 +82,7 @@ module Sinatra
         #   show_person
         # end
         else
-          yield endpoint, { verb: 'get', to: (dispatch || endpoint) }
+          yield endpoint, { verb: 'get', to: (dispatch || rationalize(endpoint)) }
         end
       end
     end
@@ -115,6 +115,11 @@ module Sinatra
     # Well... What can i say now ...? Oh, i know : too many parentheses !
     def config
       @config ||= YAML.load(open(File.join('config', 'ways-and-means.yml'))) rescue nil
+    end
+
+    def rationalize(endpoint)
+      # rationalized... but not too clever though.
+      endpoint.to_s.gsub('/', '_').gsub(/[^A-Za-z0-9_]/, '').gsub('_id', '').gsub(/_$/, '')
     end
 
   end

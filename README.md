@@ -43,7 +43,8 @@ also can be specified by passing a hash at `ways_and_means!` call, like this :
 
 ``` ruby
 ways_and_means! ways: {
-  here: nil,                     # GET /here => here equivalent to here: 'here'.
+  here: nil,                     # GET /here => here
+                                 # Equivalent to here: 'here'.
                                  # Endpoint 'here' is "rationalized" from route
                                  # the way it is explained below
   there: {

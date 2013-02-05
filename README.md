@@ -139,7 +139,7 @@ application `settings`.
 ### Hooks
 
 This simple feature lets you setup `before` and `after` hooks. Sinatra already
-has got `before`s and `after`s but they are filters, not hooks.
+has got `before` and `after` but they are filters, not hooks.
 
 Given a route callback (say `show_index` in the routes above), user-defined
 `before_anyway` and `before_show_index` (`"before_#{route_callback}"`) methods

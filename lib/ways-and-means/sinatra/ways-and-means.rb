@@ -15,6 +15,8 @@ module Sinatra
     # HTTP verbs list
     VERBS = %w|get post patch put delete head options|.freeze
 
+    attr_reader :ways
+
     def ways_and_means!(ways_and_means=nil)
       # Pfff'... Should probably be more tyrannical here...
       # if you registered, you should know what you're doing, right ?
@@ -27,10 +29,11 @@ module Sinatra
       # get '/plop' do
       #   callback
       # end
-      ways do |endpoint, dispatch|
+      ways! do |endpoint, dispatch|
         # if ever you wanna do something
         # with dispatch info' set right
         yield endpoint, dispatch if block_given?
+        (@ways ||= []) << [endpoint, dispatch]
 
         if dispatch[:renderer]
           define_method dispatch[:to].to_sym do
@@ -51,12 +54,12 @@ module Sinatra
       end
 
       # settings
-      means
+      means!
     end
 
     private
 
-    def ways
+    def ways!
       ways_config.each do |endpoint, dispatch|
         # home: { get: { to: 'home', other_params: "plop" }, patch: { to: 'patch_home', other_params: "plip" } }
         # get '/home' do
@@ -93,7 +96,7 @@ module Sinatra
       end
     end
 
-    def means
+    def means!
       # set key / values in App.settings
       means_config.each do |mean, it|
         set mean, it

@@ -92,10 +92,25 @@ describe Sinatra::WaysAndMeans do
     end
   end
 
+  describe 'ways' do
+    it "should give a list of the set routes" do
+      [
+        [:here,             {verb: "get",  to: "here"}        ],
+        [:there,            {verb: :post,  to: "post_there", renderer: :my_renderer}],
+        [:there,            {verb: :patch, to: "patch_there"} ],
+        [:where,            {verb: "get",  to: "where",      renderer: :my_renderer}],
+        [:index,            {verb: "get",  to: "show_index"}  ],
+        [:list,             {verb: "post", to: "post_list"}   ],
+        ["show/:person_id", {verb: "get",  to: "show_person"} ]
+      ].all? do |dispatch|
+        WaysAndMeansTester.ways.should include(dispatch)
+      end
+    end
+  end
+
   describe 'settings' do
     it 'should gather settings' do
       WaysAndMeansTester.settings.location.should == 'plop'
-      WaysAndMeansTester.settings.respond_to?(:ways).should be_false
     end
   end
 

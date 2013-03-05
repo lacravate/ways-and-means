@@ -18,18 +18,19 @@ end
 conf = {
   # routes
   ways: {
-    # /here => here
+    # get /here => here, get is implicit
     here: nil,
 
     there: {
       # post /there => post_there
-      post: { to: 'post_there' },
+      post: { to: 'post_there', renderer: :my_renderer },
       # patch /there => patch_there
       patch: { to: 'patch_there' }
     },
 
-    # get /index => show_indew
-    # get is implicit
+    where: { renderer: :my_renderer },
+
+    # get /index => show_indew, get is implicit
     index: { to: 'show_index' },
 
     # post /list => post_list
@@ -63,8 +64,10 @@ class WaysAndMeansTester < Sinatra::Base
   # call routes setup and define target callback
   # on the fly, for now and any newcomer in the spec's
   ways_and_means! do |endpoint, dispatch|
-    define_method dispatch[:to].to_sym do
-      dispatch[:to].to_s.dup
+    unless %w|where post_there|.include? dispatch[:to].to_s
+      define_method dispatch[:to].to_sym do
+        dispatch[:to].to_s.dup
+      end
     end
   end
 
@@ -78,6 +81,10 @@ class WaysAndMeansTester < Sinatra::Base
 
   def before_here
     self.class.set :hook, "before_here"
+  end
+
+  def my_renderer(data)
+    "i rendered #{data}"
   end
 
 end

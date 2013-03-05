@@ -32,6 +32,12 @@ module Sinatra
         # with dispatch info' set right
         yield endpoint, dispatch if block_given?
 
+        if dispatch[:renderer]
+          define_method dispatch[:to].to_sym do
+            send dispatch[:renderer], dispatch[:to].to_sym
+          end
+        end
+
         send dispatch[:verb], "/#{endpoint}" do
           # before hooks before
           ['before_anyway', "before_#{dispatch[:to]}"].each { |hook| respond_to?(hook, true) && send(hook) }
@@ -62,7 +68,7 @@ module Sinatra
         # end
         if dispatch.is_a?(Hash) && dispatch.keys.any? { |k| VERBS.include? k.to_s }
           dispatch.each do |k, v|
-            yield endpoint, v.merge(verb: k)
+            yield endpoint, {verb: k, to: rationalize(endpoint) }.merge(v)
           end
 
         # index: { to: 'show_index', other_params: "plop" }
@@ -70,7 +76,7 @@ module Sinatra
         #   show_index
         # end
         elsif dispatch.is_a?(Hash)
-          yield endpoint, { verb: 'get' }.merge!(dispatch)
+          yield endpoint, { verb: 'get', to: rationalize(endpoint) }.merge!(dispatch)
 
         # show: nil
         # get '/show' do  ## no verb specified, defaulted to 'get'
@@ -93,7 +99,7 @@ module Sinatra
         set mean, it
       end
     end
- 
+
     def ways_config
       # hash.slice, i miss you...
       # at least this is safe and very explicit
@@ -105,7 +111,7 @@ module Sinatra
       # and this is ruby-coated Perl
       # WAYS_KEYS.map { |k| [k, k.to_sym] }.flatten.map { |k| config[k] }.compact.first
     end
- 
+
     def means_config
       # hash.slice, i miss you...
       # at least this is safe and very explicit

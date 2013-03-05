@@ -45,7 +45,7 @@ module Sinatra
             # after hooks in a tap, because i like tap
             # Mmmh ? And yes, also because i need to maintain the return of the
             # route call back as the return value of the route
-            ['after_anyway', "after_#{dispatch[:to]}"].each { |hook| respond_to?(hook, true) && send(hook) }
+            ["after_#{dispatch[:to]}", 'after_anyway'].each { |hook| respond_to?(hook, true) && send(hook) }
           end
         end
       end

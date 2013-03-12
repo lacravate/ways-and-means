@@ -37,7 +37,10 @@ module Sinatra
 
         if dispatch[:renderer]
           define_method dispatch[:to].to_sym do
-            send dispatch[:renderer], dispatch[:to].to_sym
+            send dispatch[:renderer],
+                 dispatch[:to].to_sym,
+                 respond_to?(:renderer_options, true) ? send(:renderer_options) : {},
+                 respond_to?(:renderer_locals, true) ? send(:renderer_locals) : {}
           end
         end
 

@@ -83,8 +83,12 @@ class WaysAndMeansTester < Sinatra::Base
     self.class.set :hook, "before_here"
   end
 
-  def my_renderer(data)
-    "i rendered #{data}"
+  def my_renderer(data, options, locals)
+    "i rendered #{data}#{locals[:with_args]}"
+  end
+
+  def renderer_locals
+    params[:locals] ? { with_args: " with args"} : {}
   end
 
 end

@@ -62,8 +62,8 @@ describe Sinatra::WaysAndMeans do
     end
 
     it "should have the right response to POST /there" do
-      browser.post '/there'
-      browser.last_response.body.should == 'i rendered post_there'
+      browser.post '/there', locals: true
+      browser.last_response.body.should == 'i rendered post_there with args'
       WaysAndMeansTester.settings.hook.should == 'hook'
     end
 

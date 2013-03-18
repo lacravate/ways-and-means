@@ -88,7 +88,7 @@ class WaysAndMeansTester < Sinatra::Base
   end
 
   def renderer_locals
-    params[:locals] ? { with_args: " with args"} : {}
+    params[:locals] ? { with_args: " with args" } : {}
   end
 
 end

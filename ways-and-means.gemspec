@@ -18,6 +18,8 @@ Gem::Specification.new do |s|
   s.rubyforge_project = '[none]'
 
   s.add_dependency "sinatra"
+  s.add_dependency "pathstring"
+
   s.add_development_dependency "rspec"
   s.add_development_dependency 'rack-test'
 end

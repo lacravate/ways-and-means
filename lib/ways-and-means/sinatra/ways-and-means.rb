@@ -2,6 +2,8 @@
 
 require 'sinatra/base'
 
+require 'pathstring'
+
 module Sinatra
 
   module WaysAndMeans
@@ -35,14 +37,7 @@ module Sinatra
         yield endpoint, dispatch if block_given?
         (@ways ||= []) << [endpoint, dispatch]
 
-        if dispatch[:renderer]
-          define_method dispatch[:to].to_sym do
-            send dispatch[:renderer],
-                 dispatch[:to].to_sym,
-                 respond_to?(:renderer_options, true) ? send(:renderer_options) : {},
-                 respond_to?(:renderer_locals, true) ? send(:renderer_locals) : {}
-          end
-        end
+        renderer_callbacks dispatch if dispatch[:renderer]
 
         send dispatch[:verb], "/#{endpoint}" do
           # before hooks before
@@ -56,8 +51,25 @@ module Sinatra
         end
       end
 
+      make_way! if @config['make_way'] || @config[:make_way]
+
       # settings
       means!
+    end
+
+    def make_way!
+      ways.each do |endpoint, dispatch|
+        define_method "#{dispatch[:to]}_root".to_sym do
+          instance_variable_get("@#{dispatch[:to]}_root") || instance_variable_set(
+            "@#{dispatch[:to]}_root",
+            Pathstring.new("/#{dispatch[:to]}")
+          )
+        end
+
+        define_method "#{dispatch[:to]}_url".to_sym do |*args|
+          send("#{dispatch[:to]}_root").join(*args)
+        end
+      end
     end
 
     private
@@ -103,6 +115,15 @@ module Sinatra
       # set key / values in App.settings
       means_config.each do |mean, it|
         set mean, it
+      end
+    end
+
+    def renderer_callbacks(dispatch)
+      define_method dispatch[:to].to_sym do
+        send dispatch[:renderer],
+             dispatch[:to].to_sym,
+             respond_to?(:renderer_options, true) ? send(:renderer_options) : {},
+             respond_to?(:renderer_locals, true) ? send(:renderer_locals) : {}
       end
     end
 

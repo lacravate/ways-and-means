@@ -121,13 +121,19 @@ describe Sinatra::WaysAndMeans do
     end
   end
 
-  describe 'clean endpoints' do
+  describe 'clean endpoints and make_way' do
     let(:routes_array) { [ 'browse', 'browse/*', 'show/*', 'read/*', :plop, 'plip/plap/?', 'show/:resource_id' ] }
+    let(:clean_endpoints) { [ 'show_resource', 'plop', 'plip_plap', 'browse', 'show', 'read' ] }
 
     it "should build a set of routes/endpoints from an array" do
-      WaysAndMeansTester.ways_and_means! ways: routes_array do |endpoint, dispatch|
-        [ 'show_resource', 'plop', 'plip_plap', 'browse', 'show', 'read' ].include?(dispatch[:to]).should be_true
+      WaysAndMeansTester.ways_and_means! ways: routes_array, make_way: true do |endpoint, dispatch|
+        clean_endpoints.include?(dispatch[:to]).should be_true
+      end
+
+      clean_endpoints.each do |clean|
+        WaysAndMeansTester.instance_methods.should include("#{clean}_url".to_sym)
       end
     end
   end
+
 end

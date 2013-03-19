@@ -42,7 +42,8 @@ conf = {
   means: {
     # conf
     location: 'plop'
-  }
+  },
+  defaults: { renderer: :primary_renderer }
 }
 
 # 'got to implement a way to specify the config file path
@@ -81,6 +82,10 @@ class WaysAndMeansTester < Sinatra::Base
 
   def before_here
     self.class.set :hook, "before_here"
+  end
+
+  def primary_renderer(data, options, locals)
+    data.to_s
   end
 
   def my_renderer(data, options, locals)

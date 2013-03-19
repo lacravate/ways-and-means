@@ -37,7 +37,7 @@ module Sinatra
         yield endpoint, dispatch if block_given?
         (@ways ||= []) << [endpoint, dispatch]
 
-        renderer_callbacks dispatch if dispatch[:renderer]
+        renderer_callback dispatch if dispatch[:renderer]
 
         send dispatch[:verb], "/#{endpoint}" do
           # before hooks before
@@ -74,6 +74,10 @@ module Sinatra
 
     private
 
+    def defaults
+      config['defaults'] || config[:defaults] || {}
+    end
+
     def ways!
       ways_config.each do |endpoint, dispatch|
         # home: { get: { to: 'home', other_params: "plop" }, patch: { to: 'patch_home', other_params: "plip" } }
@@ -86,7 +90,7 @@ module Sinatra
         # end
         if dispatch.is_a?(Hash) && dispatch.keys.any? { |k| VERBS.include? k.to_s }
           dispatch.each do |k, v|
-            yield endpoint, {verb: k, to: rationalize(endpoint) }.merge(v)
+            yield endpoint, defaults.merge(verb: k, to: rationalize(endpoint)).merge(v)
           end
 
         # index: { to: 'show_index', other_params: "plop" }
@@ -94,7 +98,7 @@ module Sinatra
         #   show_index
         # end
         elsif dispatch.is_a?(Hash)
-          yield endpoint, { verb: 'get', to: rationalize(endpoint) }.merge!(dispatch)
+          yield endpoint, defaults.merge(verb: 'get', to: rationalize(endpoint)).merge(dispatch)
 
         # show: nil
         # get '/show' do  ## no verb specified, defaulted to 'get'
@@ -106,7 +110,7 @@ module Sinatra
         #   show_person
         # end
         else
-          yield endpoint, { verb: 'get', to: (dispatch || rationalize(endpoint)) }
+          yield endpoint, defaults.merge(verb: 'get', to: (dispatch || rationalize(endpoint)))
         end
       end
     end
@@ -118,12 +122,12 @@ module Sinatra
       end
     end
 
-    def renderer_callbacks(dispatch)
+    def renderer_callback(dispatch)
       define_method dispatch[:to].to_sym do
         send dispatch[:renderer],
              dispatch[:to].to_sym,
              respond_to?(:renderer_options, true) ? send(:renderer_options) : {},
-             respond_to?(:renderer_locals, true) ? send(:renderer_locals) : {}
+             respond_to?(:renderer_locals, true)  ? send(:renderer_locals)  : {}
       end
     end
 

@@ -95,13 +95,13 @@ describe Sinatra::WaysAndMeans do
   describe 'ways' do
     it "should give a list of the set routes" do
       [
-        [:here,             {verb: "get",  to: "here"}        ],
-        [:there,            {verb: :post,  to: "post_there", renderer: :my_renderer}],
-        [:there,            {verb: :patch, to: "patch_there"} ],
-        [:where,            {verb: "get",  to: "where",      renderer: :my_renderer}],
-        [:index,            {verb: "get",  to: "show_index"}  ],
-        [:list,             {verb: "post", to: "post_list"}   ],
-        ["show/:person_id", {verb: "get",  to: "show_person"} ]
+        [:here,             {verb: "get",  to: "here",        renderer: :primary_renderer } ],
+        [:there,            {verb: :post,  to: "post_there",  renderer: :my_renderer}       ],
+        [:there,            {verb: :patch, to: "patch_there", renderer: :primary_renderer}  ],
+        [:where,            {verb: "get",  to: "where",       renderer: :my_renderer}       ],
+        [:index,            {verb: "get",  to: "show_index",  renderer: :primary_renderer}  ],
+        [:list,             {verb: "post", to: "post_list",   renderer: :primary_renderer}  ],
+        ["show/:person_id", {verb: "get",  to: "show_person", renderer: :primary_renderer}  ]
       ].all? do |dispatch|
         WaysAndMeansTester.ways.should include(dispatch)
       end

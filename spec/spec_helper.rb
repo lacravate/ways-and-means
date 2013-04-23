@@ -14,57 +14,53 @@ end
 
 #
 
-# Routes (and a little bit of conf') in a hash
-conf = {
-  # routes
-  ways: {
-    # get /here => here, get is implicit
-    here: nil,
-
-    there: {
-      # post /there => post_there
-      post: { to: 'post_there', renderer: :my_renderer },
-      # patch /there => patch_there
-      patch: { to: 'patch_there' }
-    },
-
-    where: { renderer: :my_renderer },
-
-    # get /index => show_indew, get is implicit
-    index: { to: 'show_index' },
-
-    # post /list => post_list
-    list: { to: 'post_list', verb: 'post' },
-
-    # get /show/42 => show_person
-    'show/:person_id' => "show_person"
-  },
-  means: {
-    # conf
-    location: 'plop'
-  },
-  defaults: { renderer: :primary_renderer }
-}
-
-# 'got to implement a way to specify the config file path
-# because it's useful and to put this away from the lib's
-# root directory
-
-# Hash in a file
-FileUtils.mkdir_p 'config'
-File.open(File.join('config', 'ways-and-means.yml'), 'w') { |f| f.write YAML.dump(conf) }
-
 # Blue eyes
 require 'sinatra/base'
 
 # The app'
 class WaysAndMeansTester < Sinatra::Base
 
+  # Routes (and a little bit of conf') in a hash
+  WAYS_MEANS = {
+    # routes
+    ways: {
+      # get /here => here, get is implicit
+      here: nil,
+
+      there: {
+        # post /there => post_there
+        post: { to: 'post_there', renderer: :my_renderer },
+        # patch /there => patch_there
+        patch: { to: 'patch_there' }
+      },
+
+      where: { renderer: :my_renderer },
+
+      hither: [:put, :head],
+
+      # get /index => show_indew, get is implicit
+      index: { to: 'show_index' },
+
+      # post /list => post_list
+      list: { to: 'post_list', verb: 'post' },
+
+      # get /show/42 => show_person
+      'show/:person_id' => "show_person"
+    },
+
+    means: {
+      # conf
+      location: 'plop'
+    },
+
+    defaults: { renderer: :primary_renderer }
+  }
+
   register Sinatra::WaysAndMeans
 
   # call routes setup and define target callback
   # on the fly, for now and any newcomer in the spec's
-  ways_and_means! do |endpoint, dispatch|
+  ways_and_means! WAYS_MEANS do |endpoint, dispatch|
     unless %w|where post_there|.include? dispatch[:to].to_s
       define_method dispatch[:to].to_sym do
         dispatch[:to].to_s.dup
@@ -97,6 +93,3 @@ class WaysAndMeansTester < Sinatra::Base
   end
 
 end
-
-# cleaning
-FileUtils.rm_f File.join('config', 'ways-and-means.yml')

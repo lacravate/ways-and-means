@@ -46,6 +46,16 @@ describe Sinatra::WaysAndMeans do
       browser.get '/show/42'
       browser.last_response.status.should_not >= 400
     end
+
+    it "should respond to PUT /hither" do
+      browser.put '/hither'
+      browser.last_response.status.should_not >= 400
+    end
+
+    it "should respond to HEAD /hither" do
+      browser.head '/hither'
+      browser.last_response.status.should_not >= 400
+    end
   end
 
   describe "output" do
@@ -90,18 +100,32 @@ describe Sinatra::WaysAndMeans do
       browser.last_response.body.should == 'show_person'
       WaysAndMeansTester.settings.hook.should == 'hook'
     end
+
+    it "should have the right response to PUT /hither" do
+      browser.put '/hither'
+      browser.last_response.body.should == 'put_hither'
+      WaysAndMeansTester.settings.hook.should == 'hook'
+    end
+
+    it "should have the right response to HEAD /hither" do
+      browser.head '/hither'
+      browser.last_response.body.should == ''
+      WaysAndMeansTester.settings.hook.should == 'hook'
+    end
   end
 
   describe 'ways' do
     it "should give a list of the set routes" do
       [
-        [:here,             {verb: "get",  to: "here",        renderer: :primary_renderer } ],
-        [:there,            {verb: :post,  to: "post_there",  renderer: :my_renderer}       ],
-        [:there,            {verb: :patch, to: "patch_there", renderer: :primary_renderer}  ],
-        [:where,            {verb: "get",  to: "where",       renderer: :my_renderer}       ],
-        [:index,            {verb: "get",  to: "show_index",  renderer: :primary_renderer}  ],
-        [:list,             {verb: "post", to: "post_list",   renderer: :primary_renderer}  ],
-        ["show/:person_id", {verb: "get",  to: "show_person", renderer: :primary_renderer}  ]
+        [:here,             {verb: "get",   to: "here",        renderer: :primary_renderer } ],
+        [:there,            {verb: "post",  to: "post_there",  renderer: :my_renderer}       ],
+        [:there,            {verb: "patch", to: "patch_there", renderer: :primary_renderer}  ],
+        [:where,            {verb: "get",   to: "where",       renderer: :my_renderer}       ],
+        [:hither,           {verb: "put",   to: "put_hither",  renderer: :primary_renderer}  ],
+        [:hither,           {verb: "head",  to: "head_hither", renderer: :primary_renderer}  ],
+        [:index,            {verb: "get",   to: "show_index",  renderer: :primary_renderer}  ],
+        [:list,             {verb: "post",  to: "post_list",   renderer: :primary_renderer}  ],
+        ["show/:person_id", {verb: "get",   to: "show_person", renderer: :primary_renderer}  ]
       ].all? do |dispatch|
         WaysAndMeansTester.ways.should include(dispatch)
       end

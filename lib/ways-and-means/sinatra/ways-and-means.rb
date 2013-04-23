@@ -88,9 +88,9 @@ module Sinatra
         # patch '/home' do
         #   patch_home
         # end
-        if dispatch.is_a?(Hash) && dispatch.keys.any? { |k| VERBS.include? k.to_s }
+        if dispatch.respond_to?(:any?) && dispatch.any? { |k, v| VERBS.include? k.to_s }
           dispatch.each do |k, v|
-            yield endpoint, defaults.merge(verb: k, to: rationalize(endpoint)).merge(v)
+            yield endpoint, defaults.merge(verb: k.to_s, to: rationalize("#{k}_#{endpoint}")).merge(v || {})
           end
 
         # index: { to: 'show_index', other_params: "plop" }

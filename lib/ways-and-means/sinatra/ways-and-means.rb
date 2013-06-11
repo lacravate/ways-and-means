@@ -59,10 +59,11 @@ module Sinatra
 
     def make_way!
       ways.each do |endpoint, dispatch|
+        endpoint = rationalize endpoint
         define_method "#{dispatch[:to]}_root".to_sym do
           instance_variable_get("@#{dispatch[:to]}_root") || instance_variable_set(
             "@#{dispatch[:to]}_root",
-            Pathstring.new("/#{dispatch[:to]}")
+            Pathstring.new("/#{endpoint}")
           )
         end
 

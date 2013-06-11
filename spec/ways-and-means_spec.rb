@@ -154,6 +154,12 @@ describe Sinatra::WaysAndMeans do
         clean_endpoints.include?(dispatch[:to]).should be_true
       end
 
+      WaysAndMeansTester.ways_and_means! ways: { bim: [:post] }, make_way: true do |endpoint, dispatch|
+        dispatch[:to].should == 'post_bim'
+      end
+
+      WaysAndMeansTester.new!.post_bim_url('plawp').should == '/bim/plawp'
+
       clean_endpoints.each do |clean|
         WaysAndMeansTester.instance_methods.should include("#{clean}_url".to_sym)
       end

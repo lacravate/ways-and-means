@@ -17,44 +17,52 @@ module Sinatra
     # HTTP verbs list
     VERBS = %w|get post patch put delete head options|.freeze
 
+    attr_accessor :config
     attr_reader :ways
 
-    def ways_and_means!(ways_and_means=nil)
-      # Pfff'... Should probably be more tyrannical here...
-      # if you registered, you should know what you're doing, right ?
-      return unless @config = ways_and_means || config
+    def ways_and_means!(*ways_and_means)
+      ways_and_means << { file: true } if ways_and_means.empty?
 
-      # the verb
-      # the endpoint to string prefixed by '/'
-      # the callback
-      #
-      # get '/plop' do
-      #   callback
-      # end
-      ways! do |endpoint, dispatch|
-        # if ever you wanna do something
-        # with dispatch info' set right
-        yield endpoint, dispatch if block_given?
-        (@ways ||= []) << [endpoint, dispatch]
+      ways_and_means.each do |w_m|
+        @config = if w_m[:file] || w_m['file']
+          config_from_file w_m[:file] || w_m['file']
+        else
+          w_m
+        end
 
-        renderer_callback dispatch if dispatch[:renderer]
 
-        send dispatch[:verb], "/#{endpoint}" do
-          # before hooks before
-          ['before_anyway', "before_#{dispatch[:to]}"].each { |hook| respond_to?(hook, true) && send(hook) }
-          send(dispatch[:to]).tap do
-            # after hooks in a tap, because i like tap
-            # Mmmh ? And yes, also because i need to maintain the return of the
-            # route call back as the return value of the route
-            ["after_#{dispatch[:to]}", 'after_anyway'].each { |hook| respond_to?(hook, true) && send(hook) }
+        # the verb
+        # the endpoint to string prefixed by '/'
+        # the callback
+        #
+        # get '/plop' do
+        #   callback
+        # end
+        ways! do |endpoint, dispatch|
+          # if ever you wanna do something
+          # with dispatch info' set right
+          yield endpoint, dispatch if block_given?
+          (@ways ||= []) << [endpoint, dispatch]
+
+          renderer_callback dispatch if dispatch[:renderer]
+
+          send dispatch[:verb], "/#{endpoint}" do
+            # before hooks before
+            ['before_anyway', "before_#{dispatch[:to]}"].each { |hook| respond_to?(hook, true) && send(hook) }
+            send(dispatch[:to]).tap do
+              # after hooks in a tap, because i like tap
+              # Mmmh ? And yes, also because i need to maintain the return of the
+              # route call back as the return value of the route
+              ["after_#{dispatch[:to]}", 'after_anyway'].each { |hook| respond_to?(hook, true) && send(hook) }
+            end
           end
         end
+
+        make_way! if @config['make_way'] || @config[:make_way]
+
+        # settings
+        means!
       end
-
-      make_way! if @config['make_way'] || @config[:make_way]
-
-      # settings
-      means!
     end
 
     def make_way!
@@ -150,14 +158,15 @@ module Sinatra
       config['means'] || config[:means] || config['config'] || config[:config] || {}
     end
 
-    # Well... What can i say now ...? Oh, i know : too many parentheses !
-    def config
-      @config ||= YAML.load(open(File.join('config', 'ways-and-means.yml'))) rescue nil
-    end
-
     def rationalize(endpoint)
       # rationalized... but not too clever though.
       endpoint.to_s.gsub('/', '_').gsub(/[^A-Za-z0-9_]/, '').gsub('_id', '').gsub(/_$/, '')
+    end
+
+    def config_from_file(file)
+      file = ['config', 'ways-and-means.yml'] if file == true
+
+      YAML.load Pathstring.join(*file).read rescue {}
     end
 
   end

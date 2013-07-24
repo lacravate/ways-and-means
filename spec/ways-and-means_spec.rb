@@ -4,6 +4,51 @@ require 'spec_helper'
 
 describe Sinatra::WaysAndMeans do
 
+  let(:ways_and_means) {
+    {
+      # routes
+      ways: {
+        # get /here => here, get is implicit
+        here: nil,
+
+        there: {
+          # post /there => post_there
+          post: { to: 'post_there', renderer: :my_renderer },
+          # patch /there => patch_there
+          patch: { to: 'patch_there' }
+        },
+
+        where: { renderer: :my_renderer },
+
+        hither: [:put, :head],
+
+        # get /index => show_indew, get is implicit
+        index: { to: 'show_index' },
+
+        # post /list => post_list
+        list: { to: 'post_list', verb: 'post' },
+
+        # get /show/42 => show_person
+        'show/:person_id' => "show_person"
+      },
+
+      means: {
+        # conf
+        location: 'plop'
+      },
+
+      defaults: { renderer: :primary_renderer }
+    }
+  }
+
+  let(:dsl) { ways_and_means }
+
+  before {
+    WaysAndMeansTester.ways.clear if WaysAndMeansTester.ways
+    WaysAndMeansTester.conf = dsl
+    WaysAndMeansTester.setup
+  }
+
   let(:browser) { Rack::Test::Session.new(Rack::MockSession.new(WaysAndMeansTester)) }
 
   describe "routes" do
@@ -164,6 +209,38 @@ describe Sinatra::WaysAndMeans do
         WaysAndMeansTester.instance_methods.should include("#{clean}_url".to_sym)
       end
     end
+  end
+
+  describe "DSL" do
+    let(:config_file) { Pathstring.join 'config', 'ways-and-means.yml' }
+
+    context "explicit DSL" do
+      it "should get config from file and hash" do
+        config_file.save! YAML.dump({ means: { plap: "plip" } })
+        WaysAndMeansTester.ways.clear if WaysAndMeansTester.ways
+        WaysAndMeansTester.ways_and_means!({file: true}, ways_and_means)
+
+        WaysAndMeansTester.settings.location.should == 'plop'
+        WaysAndMeansTester.settings.plap.should == 'plip'
+        WaysAndMeansTester.ways.size.should == 9
+      end
+    end
+
+    context "implicit DSL" do
+      it "should get config from file only" do
+        config_file.save! YAML.dump({ means: { plap: "plip" } })
+        WaysAndMeansTester.ways.clear if WaysAndMeansTester.ways
+        WaysAndMeansTester.ways_and_means!
+
+        WaysAndMeansTester.settings.location.should == 'plop'
+        WaysAndMeansTester.settings.plap.should == 'plip'
+        WaysAndMeansTester.ways.size.should == 0
+      end
+    end
+
+    after {
+      config_file.delete if config_file.exist?
+    }
   end
 
 end

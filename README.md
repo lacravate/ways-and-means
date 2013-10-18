@@ -38,85 +38,101 @@ end
 
 ### Ways
 
-In this case, routes will be read from `config/ways-and-means.yml`. But they
-also can be specified by passing a hash at `ways_and_means!` call, like this :
+If no definition has was passed, and no filename given, it will look for a
+`config/ways_and_means.yml` file.
 
 ``` ruby
-ways_and_means! ways: {
-  here: nil,                     # GET /here => here
-                                 # Equivalent to here: 'here'.
-                                 # Endpoint 'here' is "rationalized" from route
-                                 # the way it is explained below
-  there: {
-    post: { to: 'post_there' },  # POST /there => post_there
-    patch: { to: 'patch_there' } # PATCH /there => patch_there
+ways_and_means! items = {           # the assignment here is only useful to make
+    file: true                      # Ruby understand the first argument is a
+  },                                # hash and not a block
+
+  { ways: { login: [:post, :put] }, # endpoint with a list of verbs
+    make_way: true
+  },
+  { ways: ['here/*', 'there/*'],    # list of endpoints, GET is implicit
+    make_way: true
+  },
+  { ways: ['show/*', 'admin/*'],    # list of endpoints
+    defaults: { renderer: :slim },  # different defaults
+    make_way: true
   },
 
-  index: { to: 'show_index' },   # GET /index => show_index, GET is implicit
-  list: {                        # POST /list => post_list
-    to: 'post_list',
-    verb: 'post'
-  },
-  'stuff/:id' => "get_stuff"     # GET /stuff/42 => get_stuff
-}
+  # explicit definitions
+  {
+    that: {                              # endpoint
+      post: { to: 'not_not_post_that' }, # explicit definition of callbacks
+      patch: { to: 'really_patch_that' } # per verb
+    },
+    list: {                              # single endpoint definition
+      to: 'list_post',                   # with its callback
+      verb: 'post'                       # and verb
+    }
+  }
+
+# this would have worked with several call to `ways_and_means!` :
+# ways_and_means! file: true
+# ways_and_means! ways: { login: [:post, :put] },
+#                 make_way: true
+# and so on...
+
 ```
 
 This will be equivalent, in a Sinatra app', to :
 
 ``` ruby
+post '/login' do
+  post_login
+end
+
+put '/login' do
+  post_login
+end
+
 get '/here' do
-  here
+  get_here
 end
 
-post '/there' do
-  post_there
+get '/there' do
+  get_there
 end
 
-patch '/there' do
-  patch_there
+get '/show/*' do
+  slim :show, renderer_options, renderer_locals # renderer_options and
+                                                # renderer_locals are
+                                                # user-defined methods
+                                                # defaulting to {}
 end
 
-get '/index' do
-  show_index
+get '/admin/*' do
+  slim :show, renderer_options, renderer_locals
+end
+
+post '/that' do
+  not_not_post_that
+end
+
+patch '/that' do
+  really_patch_that
 end
 
 post '/list' do
-  post_list
-end
-
-get '/show/:person_id' do
-  show_person
+  list_post
 end
 ```
 
-For very (very very) simple routing, routes can be passed as a list,
-`ways-and-means` will do its best to rationalize the endpoint and turn it into a
-callback.
+With `file` option to point there will be definitions or configurations to be
+found in a file (you can pass a filename instead of `true`).
 
-```ruby
-ways_and_means! ways: [:here, 'get/that/?', 'show/:resource_id', 'browse/*']
-
-```
-
-will be (hopefully) understood as :
-
-```ruby
-get '/here' do
-  here
-end
-
-get 'get/that/?' do
-  get_that # '/' turned to '_', trailing '_' is discarded
-end
-
-get 'show/resource_id' do
-  show_resource # '/' turned to '_', '_id' are discarded
-end
-
-get 'browse/*' do
-  browse # keep only /A-Za-z0-9_/, no trailing '_'
+With `renderer` option to spare you from writing stupid lines of code such as :
+``` ruby
+get '/that' do
+  haml :that
 end
 ```
+
+With `make_way` option to create simple route builder helper methods :
+  post_login_root # works like a pathname, hence use join
+  post_login_url  # will make the join for you with the arguments list you passed
 
 ### Means
 
@@ -141,36 +157,17 @@ application `settings`.
 This simple feature lets you setup `before` and `after` hooks. Sinatra already
 has got `before` and `after` but they are filters, not hooks.
 
-Given a route callback (say `show_index` in the routes above), user-defined
-`before_anyway` and `before_show_index` (`"before_#{route_callback}"`) methods
-will be executed before the route callback if defined. As well, `after_anyway`
-or `after_show_index` (`"after_#{route_callback}"`) will be executed after the
+Given a route callback (say `get_here` in the routes above), user-defined
+`before_anyway` and `before_get_here` (`"before_#{route_callback}"`) methods
+will be called before the route callback, if defined. As well, `after_anyway`
+or `after_get_here` will be called after the
 route callback if defined.
 
 ## Aims
 
-The idea is not only to save myself from some typing (even though that's an
-argument).
-
-The idea is not to issue an all-encompassing lib' that will allow to put in
-conf' any route-related feature of Sinatra.
-
-The main goal is to replace routing to where and what i think it should be
-(configuration), and put away the intelligence of the app' away from a mere
-unnamed block.
-
-## Temptations
-
- - integrate the config file Sinatra contrib to get routes config from
- - HTTP status codes
- - additionnal params passed to the callback
- - use the WTFPL
-
-## Laughs
-
-That i had thinking of the addition of spec's, comments in the code and
-documentation, compared to the amount of code, and the limited scope of this
-snippet dignified to a library with a name. 
+The main goal is to replace routing to where and what i think it should be :
+configuration. And put the intelligence of the app' in a neat module
+(for example) defining the routes callbacks.
 
 ## Thanks
 

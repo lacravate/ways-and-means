@@ -21,6 +21,7 @@ module Sinatra
     attr_reader :ways
 
     def ways_and_means!(*ways_and_means)
+      # no args ? there is a ways_and_means.yml file to parse
       ways_and_means << { file: true } if ways_and_means.empty?
 
       ways_and_means.each do |w_m|
@@ -29,7 +30,6 @@ module Sinatra
         else
           w_m
         end
-
 
         # the verb
         # the endpoint to string prefixed by '/'
@@ -58,6 +58,7 @@ module Sinatra
           end
         end
 
+        # let's make the way as we're asked
         make_way! if @config['make_way'] || @config[:make_way]
 
         # settings
@@ -66,8 +67,11 @@ module Sinatra
     end
 
     def make_way!
+      # let's define methods to format urls
       ways.each do |endpoint, dispatch|
+        # go see this beauttiful and smart sanitizer method
         endpoint = rationalize endpoint
+        # root url for this endpoint
         define_method "#{dispatch[:to]}_root".to_sym do
           instance_variable_get("@#{dispatch[:to]}_root") || instance_variable_set(
             "@#{dispatch[:to]}_root",
@@ -75,6 +79,7 @@ module Sinatra
           )
         end
 
+        # url builder method with the help of the above defined
         define_method "#{dispatch[:to]}_url".to_sym do |*args|
           send("#{dispatch[:to]}_root").join(*args)
         end
@@ -131,8 +136,11 @@ module Sinatra
       end
     end
 
+    # define route callback
     def renderer_callback(dispatch)
       define_method dispatch[:to].to_sym do
+        # call renderer with two sets of parameters,
+        # namely options ans locals, if need be
         send dispatch[:renderer],
              dispatch[:to].to_sym,
              respond_to?(:renderer_options, true) ? send(:renderer_options) : {},
@@ -164,8 +172,8 @@ module Sinatra
     end
 
     def config_from_file(file)
+      # no file name passed, build default
       file = ['config', 'ways-and-means.yml'] if file == true
-
       YAML.load Pathstring.join(*file).read rescue {}
     end
 

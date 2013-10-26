@@ -81,7 +81,8 @@ This will be equivalent, in a Sinatra app', to :
 
 ``` ruby
 post '/login' do
-  post_login
+  post_login # http verb prefix only when a verb directive
+             # was given in the definitions
 end
 
 put '/login' do
@@ -89,11 +90,11 @@ put '/login' do
 end
 
 get '/here' do
-  get_here
+  here # no word directive, plain endpoint name, no prefix
 end
 
 get '/there' do
-  get_there
+  there
 end
 
 get '/show/*' do
@@ -157,10 +158,10 @@ application `settings`.
 This simple feature lets you setup `before` and `after` hooks. Sinatra already
 has got `before` and `after` but they are filters, not hooks.
 
-Given a route callback (say `get_here` in the routes above), user-defined
-`before_anyway` and `before_get_here` (`"before_#{route_callback}"`) methods
+Given a route callback (say `here` in the routes above), user-defined
+`before_anyway` and `before_here` (`"before_#{route_callback}"`) methods
 will be called before the route callback, if defined. As well, `after_anyway`
-or `after_get_here` will be called after the
+or `after_here` will be called after the
 route callback if defined.
 
 ## Aims
